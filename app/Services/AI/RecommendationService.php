@@ -1,0 +1,296 @@
+<?php
+
+namespace App\Services\AI;
+
+use App\Models\Cart;
+use App\Models\OrderItem;
+use App\Models\Product;
+use App\Models\Review;
+use App\Models\Wishlist;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Session;
+
+class RecommendationService
+{
+    public function getRecentlyViewed(int $limit = 10): array
+    {
+        $key = $this->getSessionKey();
+
+        $viewed = Cache::get("recently_viewed:{$key}", []);
+
+        if (empty($viewed)) return [];
+
+        $products = Product::whereIn('id', array_slice($viewed, 0, $limit))
+            ->where('is_active', true)
+            ->with(['category', 'brand'])
+            ->get()
+            ->keyBy('id');
+
+        $result = [];
+        foreach (array_slice($viewed, 0, $limit) as $pid) {
+            if (isset($products[$pid])) {
+                $p = $products[$pid];
+                $result[] = [
+                    'id' => $p->id,
+                    'name' => $p->name,
+                    'slug' => $p->slug,
+                    'price' => $p->price,
+                    'sale_price' => $p->sale_price,
+                    'effective_price' => $p->getEffectivePrice(),
+                    'image' => $p->image,
+                    'brand' => $p->brand->name ?? '-',
+                ];
+            }
+        }
+
+        return $result;
+    }
+
+    public function trackProductView(int $productId): void
+    {
+        $key = $this->getSessionKey();
+        $cacheKey = "recently_viewed:{$key}";
+
+        $viewed = Cache::get($cacheKey, []);
+
+        $viewed = array_filter($viewed, fn($id) => $id !== $productId);
+        array_unshift($viewed, $productId);
+        $viewed = array_slice($viewed, 0, 50);
+
+        Cache::put($cacheKey, array_values($viewed), 86400);
+    }
+
+    public function getSimilarProducts(Product $product, int $limit = 6): array
+    {
+        $cacheKey = "similar:{$product->id}";
+        $cached = Cache::get($cacheKey);
+        if ($cached) return $cached;
+
+        $products = Product::where('is_active', true)
+            ->where('id', '!=', $product->id)
+            ->where('stock', '>', 0)
+            ->where(function ($q) use ($product) {
+                $q->where('category_id', $product->category_id)
+                  ->orWhere('brand_id', $product->brand_id);
+            })
+            ->with(['category', 'brand'])
+            ->get()
+            ->map(function ($p) use ($product) {
+                $similarity = 0;
+                if ($p->category_id === $product->category_id) $similarity += 50;
+                if ($p->brand_id === $product->brand_id) $similarity += 30;
+                $priceDiff = abs($p->price - $product->price) / max($product->price, 1);
+                $similarity += max(0, 20 - ($priceDiff * 20));
+                $p->similarity = $similarity;
+                return $p;
+            })
+            ->sortByDesc('similarity')
+            ->take($limit)
+            ->values()
+            ->map(fn($p) => [
+                'id' => $p->id,
+                'name' => $p->name,
+                'slug' => $p->slug,
+                'price' => $p->price,
+                'sale_price' => $p->sale_price,
+                'effective_price' => $p->getEffectivePrice(),
+                'image' => $p->image,
+                'brand' => $p->brand->name ?? '-',
+                'average_rating' => $p->average_rating,
+            ])
+            ->toArray();
+
+        Cache::put($cacheKey, $products, 600);
+        return $products;
+    }
+
+    public function getFrequentlyBoughtTogether(Product $product, int $limit = 4): array
+    {
+        $cacheKey = "fbt:{$product->id}";
+        $cached = Cache::get($cacheKey);
+        if ($cached) return $cached;
+
+        $orderIds = OrderItem::where('product_id', $product->id)
+            ->pluck('order_id')
+            ->unique()
+            ->take(100);
+
+        if ($orderIds->isEmpty()) return [];
+
+        $products = OrderItem::whereIn('order_id', $orderIds)
+            ->where('product_id', '!=', $product->id)
+            ->select('product_id', DB::raw('COUNT(*) as frequency'))
+            ->groupBy('product_id')
+            ->orderByDesc('frequency')
+            ->take($limit)
+            ->pluck('product_id')
+            ->toArray();
+
+        if (empty($products)) return [];
+
+        $result = Product::whereIn('id', $products)
+            ->where('is_active', true)
+            ->where('stock', '>', 0)
+            ->with(['category', 'brand'])
+            ->get()
+            ->map(fn($p) => [
+                'id' => $p->id,
+                'name' => $p->name,
+                'slug' => $p->slug,
+                'price' => $p->price,
+                'sale_price' => $p->sale_price,
+                'effective_price' => $p->getEffectivePrice(),
+                'image' => $p->image,
+            ])
+            ->toArray();
+
+        Cache::put($cacheKey, $result, 600);
+        return $result;
+    }
+
+    public function getTrendingProducts(int $limit = 10): array
+    {
+        $cacheKey = 'ai:trending_products';
+        $cached = Cache::get($cacheKey);
+        if ($cached) return $cached;
+
+        $products = Product::where('is_active', true)
+            ->where('stock', '>', 0)
+            ->with(['category', 'brand'])
+            ->select('products.*', DB::raw('
+                (SELECT COUNT(*) FROM order_items WHERE order_items.product_id = products.id) as order_count,
+                (SELECT COUNT(*) FROM wishlists WHERE wishlists.product_id = products.id) as wishlist_count
+            '))
+            ->orderByRaw('order_count + wishlist_count DESC')
+            ->take($limit)
+            ->get()
+            ->map(fn($p) => [
+                'id' => $p->id,
+                'name' => $p->name,
+                'slug' => $p->slug,
+                'price' => $p->price,
+                'sale_price' => $p->sale_price,
+                'effective_price' => $p->getEffectivePrice(),
+                'image' => $p->image,
+                'brand' => $p->brand->name ?? '-',
+                'average_rating' => $p->average_rating,
+                'order_count' => $p->order_count,
+            ])
+            ->toArray();
+
+        Cache::put($cacheKey, $products, 300);
+        return $products;
+    }
+
+    public function getPopularProducts(int $limit = 10): array
+    {
+        $cacheKey = 'ai:popular_products';
+        $cached = Cache::get($cacheKey);
+        if ($cached) return $cached;
+
+        $products = Product::where('is_active', true)
+            ->where('stock', '>', 0)
+            ->with(['category', 'brand'])
+            ->orderByRaw('(SELECT COUNT(*) FROM reviews WHERE reviews.product_id = products.id AND is_approved = 1) DESC')
+            ->take($limit)
+            ->get()
+            ->map(fn($p) => [
+                'id' => $p->id,
+                'name' => $p->name,
+                'slug' => $p->slug,
+                'price' => $p->price,
+                'sale_price' => $p->sale_price,
+                'effective_price' => $p->getEffectivePrice(),
+                'image' => $p->image,
+                'brand' => $p->brand->name ?? '-',
+                'average_rating' => $p->average_rating,
+                'reviews_count' => $p->reviews_count,
+            ])
+            ->toArray();
+
+        Cache::put($cacheKey, $products, 600);
+        return $products;
+    }
+
+    public function getRecommendedForUser(int $userId, int $limit = 10): array
+    {
+        $cacheKey = "recommended:{$userId}";
+        $cached = Cache::get($cacheKey);
+        if ($cached) return $cached;
+
+        $purchasedCategoryIds = OrderItem::whereHas('order', fn($q) => $q->where('user_id', $userId))
+            ->pluck('product_id')
+            ->unique();
+
+        $wishlistCategoryIds = Wishlist::where('user_id', $userId)
+            ->pluck('product_id')
+            ->unique();
+
+        $allInteracted = $purchasedCategoryIds->merge($wishlistCategoryIds)->unique();
+
+        if ($allInteracted->isEmpty()) {
+            return $this->getTrendingProducts($limit);
+        }
+
+        $categoryScores = DB::table('products')
+            ->whereIn('id', $allInteracted)
+            ->select('category_id', DB::raw('COUNT(*) as count'))
+            ->groupBy('category_id')
+            ->pluck('count', 'category_id')
+            ->toArray();
+
+        arsort($categoryScores);
+        $topCategories = array_slice(array_keys($categoryScores), 0, 3);
+
+        $products = Product::where('is_active', true)
+            ->where('stock', '>', 0)
+            ->whereNotIn('id', $allInteracted->toArray())
+            ->whereIn('category_id', $topCategories)
+            ->with(['category', 'brand'])
+            ->take($limit)
+            ->get()
+            ->map(fn($p) => [
+                'id' => $p->id,
+                'name' => $p->name,
+                'slug' => $p->slug,
+                'price' => $p->price,
+                'sale_price' => $p->sale_price,
+                'effective_price' => $p->getEffectivePrice(),
+                'image' => $p->image,
+                'brand' => $p->brand->name ?? '-',
+                'average_rating' => $p->average_rating,
+            ])
+            ->toArray();
+
+        Cache::put($cacheKey, $products, 900);
+        return $products;
+    }
+
+    public function getWishlistProducts(int $userId, int $limit = 5): array
+    {
+        return Wishlist::where('user_id', $userId)
+            ->with(['product.category', 'product.brand'])
+            ->take($limit)
+            ->get()
+            ->map(fn($w) => $w->product ? [
+                'id' => $w->product->id,
+                'name' => $w->product->name,
+                'slug' => $w->product->slug,
+                'price' => $w->product->price,
+                'sale_price' => $w->product->sale_price,
+                'effective_price' => $w->product->getEffectivePrice(),
+                'image' => $w->product->image,
+            ] : null)
+            ->filter()
+            ->toArray();
+    }
+
+    private function getSessionKey(): string
+    {
+        if (auth()->check()) {
+            return 'user:' . auth()->id();
+        }
+        return 'session:' . Session::getId();
+    }
+}
