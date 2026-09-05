@@ -2,9 +2,9 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between h-16 lg:h-[72px]">
             <!-- Logo -->
-            <a href="{{ route('home') }}" class="flex items-center gap-2.5 font-display font-bold text-lg lg:text-xl group" aria-label="Winky Store Home">
-                <div class="w-8 h-8 rounded-xl glow-cyan flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <a href="{{ route('home') }}" class="flex items-center gap-2 font-display font-bold text-lg lg:text-xl group" aria-label="Winky Store Home">
+                <div class="w-7 h-7 rounded-xl glow-cyan flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
                     </svg>
                 </div>
@@ -13,12 +13,12 @@
 
             <!-- Mobile Menu Button -->
             <button id="mobile-menu-btn" class="lg:hidden p-2 rounded-xl text-white/60 hover:text-[var(--cyan)] transition-colors" aria-label="Menu" onclick="toggleMobileMenu()">
-                <svg id="menu-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
-                <svg id="close-icon" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                <svg id="menu-icon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                <svg id="close-icon" class="w-4 h-4 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
 
-            <!-- Mobile Navigation (hidden on lg+, shown on sm) -->
-            <div class="hidden lg:flex lg:items-center lg:gap-1">
+            <!-- Desktop Navigation -->
+            <div class="hidden lg:flex lg:items-center lg:gap-8">
                 <a href="{{ route('home') }}" class="nx-link text-white/80 hover:text-[var(--cyan)] font-medium text-[13px] tracking-wide px-4 py-2 relative">Home</a>
                 <a href="{{ route('products.index') }}" class="nx-link text-white/80 hover:text-[var(--cyan)] font-medium text-[13px] tracking-wide px-4 py-2">Semua Produk</a>
                 @php
@@ -421,5 +421,52 @@
                 closeIcon.classList.add('hidden');
             }
         }
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(e) {
+            var mobileMenu = document.getElementById('mobile-menu');
+            var mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            if (mobileMenu && !mobileMenu.contains(e.target) && !mobileMenuBtn.contains(e.target)) {
+                mobileMenu.classList.add('hidden');
+                mobileMenu.classList.remove('open');
+                document.getElementById('menu-icon').classList.remove('hidden');
+                document.getElementById('close-icon').classList.add('hidden');
+            }
+        });
 </script>
+
+    <!-- Mobile Header Styles -->
+    <style>
+        @media (max-width: 767px) {
+            .hidden.lg\:flex lg\:items-center lg\:gap-1 {
+                display: none !important;
+            }
+            .lg:hidden.#main-navbar {
+                padding: 0 !important;
+            }
+            #main-navbar {
+                background: rgba(8, 13, 24, 0.98) !important;
+                backdrop-filter: blur(24px) !important;
+            }
+            #main-navbar .max-w-full {
+                padding-left: 0 !important;
+                padding-right: 0 !important;
+            }
+            #main-navbar .flex.items-center.justify-between {
+                height: 56px !important;
+            }
+            #main-navbar .gradient-text {
+                display: none !important;
+            }
+            #main-navbar .w-7 {
+                flex-shrink: 0 !important;
+            }
+            #main-navbar .lg:hidden {
+                z-index: 100 !important;
+            }
+            #main-navbar .mobile-menu {
+                top: 56px !important;
+            }
+        }
+    </style>
 </nav>

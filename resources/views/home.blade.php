@@ -66,7 +66,33 @@
     </div>
 </section>
 
- {{-- ═══════════════════════ ADVANTAGES BAR ═══════════════════════ --}}
+ <style>
+    @media (min-width: 1025px) {
+        .adv-grid { grid-template-columns: repeat(6,1fr); gap: 16px; }
+        .prod-grid { grid-template-columns: repeat(4,1fr); gap: 20px; }
+        .cat-grid { grid-template-columns: repeat(6,1fr); gap: 16px; }
+        .brand-grid { grid-template-columns: repeat(8,1fr); gap: 12px; }
+        .products-grid-4 { grid-template-columns: repeat(4,1fr); gap: 24px; }
+        .adv-grid-2 { grid-template-columns: repeat(4,1fr); gap: 20px; }
+    }
+
+    @media (min-width: 768px) and (max-width: 1024px) {
+        .adv-grid { grid-template-columns: repeat(4,1fr); gap: 14px; }
+        .prod-grid { grid-template-columns: repeat(3,1fr); gap: 16px; }
+        .cat-grid { grid-template-columns: repeat(4,1fr); gap: 14px; }
+        .brand-grid { grid-template-columns: repeat(6,1fr); gap: 14px; }
+        .products-grid-4 { grid-template-columns: repeat(3,1fr); gap: 20px; }
+        .adv-grid-2 { grid-template-columns: repeat(3,1fr); gap: 16px; }
+    }
+
+    @media (max-width: 767px) {
+        .adv-grid, .cat-grid, .prod-grid, .brand-grid, .products-grid-4, .adv-grid-2 {
+            grid-template-columns: repeat(2,1fr) !important; gap: 12px !important;
+        }
+    }
+</style>
+
+{{-- ═══════════════════════ ADVANTAGES BAR ═══════════════════════ --}}
 <section class="sec-sm" style="border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--bg-card);">
     <div class="container">
         <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:24px;" class="adv-grid">
