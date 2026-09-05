@@ -35,7 +35,7 @@
                 </div>
             </div>
             <div class="hero-card-wrap" style="display:flex;justify-content:center;position:relative;">
-                <div class="floating" style="width:420px;position:relative;">
+                <div class="floating" style="max-width:420px;width:100%;position:relative;">
                     <div style="position:absolute;inset:-12px;background:linear-gradient(135deg,rgba(0,229,255,0.12),rgba(41,121,255,0.08));border-radius:36px;filter:blur(20px);transform:rotate(3deg);"></div>
                     <div style="position:relative;background:var(--bg-glass);backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,0.08);border-radius:28px;padding:36px;box-shadow:0 32px 64px rgba(0,0,0,0.4);">
                         <div style="text-align:center;margin-bottom:20px;">
@@ -90,7 +90,7 @@
                 </div>
                 <h2 style="font-family:'Space Grotesk',sans-serif;font-size:36px;font-weight:800;margin:0;">Today's Flash Deals</h2>
             </div>
-            <div style="display:flex;align-items:center;gap:8px;">
+            <div style="display:flex;align-items:center;gap:8px;" class="home-countdown">
                 <span style="color:var(--text-secondary);font-size:14px;margin-right:8px;">Ends in:</span>
                 <div class="cdigit"><div id="cd-h" class="cdigit-num">00</div><div class="cdigit-label">Hrs</div></div>
                 <span class="cdot">:</span>

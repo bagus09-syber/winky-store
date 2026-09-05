@@ -458,6 +458,12 @@
             .pcard-list .pcard-img { width: 100% !important; min-height: 180px !important; }
             .pcard-list .pcard-info { flex-direction: column !important; align-items: flex-start !important; padding: 14px 16px !important; }
         }
+        @media (max-width: 390px) {
+            .home-countdown .cdigit { width: 38px; }
+            .home-countdown .cdigit-num { font-size: 16px; }
+            .home-countdown .cdigit-label { font-size: 7px; letter-spacing: 0; margin-top: 1px; }
+            .home-countdown .cdot { display: none; }
+        }
 
         /* ── Product Image (used by partials/product-image.blade.php) ── */
         .product-image { width: 100%; height: 220px; object-fit: contain; padding: 20px; }
