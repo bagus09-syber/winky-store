@@ -18,7 +18,7 @@
             </button>
 
 <!-- Desktop Navigation -->
-            <div class="hidden lg:flex lg:items-center lg:gap-4">
+            <div class="hidden lg:flex lg:items-center lg:gap-2 flex-nowrap">
                 <a href="{{ route('home') }}" class="nx-link text-white/80 hover:text-[var(--cyan)] font-medium text-[13px] tracking-wide px-4 py-2 relative">Home</a>
                 <a href="{{ route('products.index') }}" class="nx-link text-white/80 hover:text-[var(--cyan)] font-medium text-[13px] tracking-wide px-4 py-2">Semua Produk</a>
                 @php
@@ -38,7 +38,7 @@
                 @endphp
                 @foreach($navCategories as $navCat)
                 <div class="relative group" style="position:relative;">
-                    <a href="{{ route('products.index', ['category' => $navCat->slug]) }}" class="nx-link text-white/80 hover:text-[var(--cyan)] font-medium text-[11px] tracking-wide px-3 py-1.5 flex items-center gap-0.5">
+                    <a href="{{ route('products.index', ['category' => $navCat->slug]) }}" class="nx-link text-white/80 hover:text-[var(--cyan)] font-medium text-[10px] tracking-wide px-2 py-1 flex items-center gap-0.5">
                         {{ $navCat->name }}
                         @if($navCat->children->count() > 0)
                         <svg style="width:10px;height:10px;opacity:0.5;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
