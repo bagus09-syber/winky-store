@@ -192,11 +192,11 @@
 
         /* ── Badge ── */
         .badge-sale {
-            position: absolute; top: 16px; left: 16px; z-index: 2;
-            padding: 4px 12px; border-radius: 8px;
+            position: absolute; top: 12px; left: 12px; z-index: 2;
+            padding: 4px 10px; border-radius: 8px;
             background: linear-gradient(135deg, #ff3d00, #ff6d00);
-            color: #fff; font-size: 12px; font-weight: 800;
-            box-shadow: 0 4px 15px rgba(255,61,0,0.4);
+            color: #fff; font-size: 11px; font-weight: 800;
+            box-shadow: 0 4px 12px rgba(255,61,0,0.35);
         }
         .wishlist-float {
             position: absolute; top: 16px; right: 16px; z-index: 2;
@@ -435,35 +435,33 @@
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
 
-        /* ── Responsive ── */
-        @media (max-width: 1024px) {
-            .hero-grid { grid-template-columns: 1fr !important; }
-            .hero-card-wrap { display: none !important; }
-            .prod-grid, .cat-grid, .adv-grid, .adv-grid-2, .brand-grid { grid-template-columns: repeat(2,1fr) !important; }
-            .promo-grid { grid-template-columns: 1fr !important; text-align: center; }
-            .promo-wrap { padding: 48px 32px !important; }
-            .catalog-layout { grid-template-columns: 1fr !important; }
-        }
-        @media (max-width: 640px) {
-            .prod-grid, .catalog-grid { grid-template-columns: repeat(2,1fr) !important; gap: 12px !important; }
-            .cat-grid, .adv-grid, .adv-grid-2 { grid-template-columns: repeat(2,1fr) !important; }
-            .brand-grid { grid-template-columns: repeat(3,1fr) !important; }
-            .sec { padding: 64px 0; }
-            .sh h2 { font-size: 28px !important; }
-            .fs-card { flex: 0 0 240px; }
-            .cdigit { width: 44px; height: 50px; }
-            .cdigit-num { font-size: 20px; }
-            .nl-input { padding: 14px 16px; font-size: 14px; }
-            .pcard-list { flex-direction: column !important; }
-            .pcard-list .pcard-img { width: 100% !important; min-height: 180px !important; }
-            .pcard-list .pcard-info { flex-direction: column !important; align-items: flex-start !important; padding: 14px 16px !important; }
-        }
-        @media (max-width: 390px) {
-            .home-countdown .cdigit { width: 38px; }
-            .home-countdown .cdigit-num { font-size: 16px; }
-            .home-countdown .cdigit-label { font-size: 7px; letter-spacing: 0; margin-top: 1px; }
-            .home-countdown .cdot { display: none; }
-        }
+        /* ── Product Grid & Card ── */
+@media (min-width: 1025px) {
+    .prod-grid { grid-template-columns: repeat(4,1fr); gap: 20px; }
+    .cat-grid { grid-template-columns: repeat(6,1fr); gap: 16px; }
+    .adv-grid, .adv-grid-2 { grid-template-columns: repeat(4,1fr); gap: 20px; }
+    .brand-grid { grid-template-columns: repeat(8,1fr); gap: 12px; }
+    .fs-scroll { gap: 12px; }
+    .fs-card { flex: 0 0 280px; }
+}
+
+@media (min-width: 768px) and (max-width: 1024px) {
+    .prod-grid { grid-template-columns: repeat(3,1fr); gap: 16px; }
+    .cat-grid { grid-template-columns: repeat(4,1fr); gap: 14px; }
+    .adv-grid, .adv-grid-2 { grid-template-columns: repeat(3,1fr); gap: 16px; }
+    .brand-grid { grid-template-columns: repeat(6,1fr); gap: 14px; }
+    .fs-scroll { gap: 10px; }
+    .fs-card { flex: 0 0 240px; }
+}
+
+@media (max-width: 767px) {
+    .prod-grid, .catalog-grid { grid-template-columns: repeat(2,1fr) !important; gap: 12px !important; }
+    .cat-grid, .adv-grid, .adv-grid-2 { grid-template-columns: repeat(2,1fr) !important; }
+    .brand-grid { grid-template-columns: repeat(3,1fr) !important; }
+    .sec { padding: 48px 0; }
+    .sh h2 { font-size: 24px !important; }
+    .fs-card { flex: 0 0 220px; }
+}
 
         /* ── Product Image (used by partials/product-image.blade.php) ── */
         .product-image { width: 100%; height: 220px; object-fit: contain; padding: 20px; }

@@ -34,8 +34,8 @@
                     <div><div style="font-family:'Space Grotesk',sans-serif;font-size:32px;font-weight:800;color:var(--text);">4.9</div><div style="color:var(--text-secondary);font-size:13px;margin-top:4px;">Rating</div></div>
                 </div>
             </div>
-            <div class="hero-card-wrap" style="display:flex;justify-content:center;position:relative;">
-                <div class="floating" style="max-width:420px;width:100%;position:relative;">
+            <div class="hero-card-wrap" style="display:flex;justify-content:center;position:relative;padding:48px 0;">
+                    <div class="floating" style="max-width:420px;width:100%;position:relative;background:var(--bg-card);border:1px solid var(--border);border-radius:24px;padding:32px;box-shadow:0 20px 48px rgba(0,0,0,0.3);">
                     <div style="position:absolute;inset:-12px;background:linear-gradient(135deg,rgba(0,229,255,0.12),rgba(41,121,255,0.08));border-radius:36px;filter:blur(20px);transform:rotate(3deg);"></div>
                     <div style="position:relative;background:var(--bg-glass);backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,0.08);border-radius:28px;padding:36px;box-shadow:0 32px 64px rgba(0,0,0,0.4);">
                         <div style="text-align:center;margin-bottom:20px;">
