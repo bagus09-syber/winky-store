@@ -17,8 +17,8 @@
                 <svg id="close-icon" class="w-4 h-4 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
 
-            <!-- Desktop Navigation -->
-            <div class="hidden lg:flex lg:items-center lg:gap-8">
+<!-- Desktop Navigation -->
+            <div class="hidden lg:flex lg:items-center lg:gap-8 lg:flex-wrap">
                 <a href="{{ route('home') }}" class="nx-link text-white/80 hover:text-[var(--cyan)] font-medium text-[13px] tracking-wide px-4 py-2 relative">Home</a>
                 <a href="{{ route('products.index') }}" class="nx-link text-white/80 hover:text-[var(--cyan)] font-medium text-[13px] tracking-wide px-4 py-2">Semua Produk</a>
                 @php
@@ -59,8 +59,8 @@
                 @endforeach
             </div>
 
-            <!-- Right Side Actions -->
-            <div class="flex items-center gap-2 lg:gap-3">
+            <!-- Right Side Tablet/Mobile Actions (only show on lg+) -->
+            <div class="lg:hidden">
                 <!-- Search -->
                 <button id="search-btn" class="relative p-2.5 text-white/60 hover:text-[var(--cyan)] transition-colors rounded-xl hover:bg-white/5" aria-label="Search">
                     <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
