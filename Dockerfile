@@ -41,11 +41,6 @@ RUN addgroup -S appgroup && adduser -S appuser -G appgroup \
 # Expose port for DockHosting (environment variable PORT will override default 80)
 EXPOSE 80
 
-# Health check HTTP endpoint
-HEALTHCHECK --interval=30s --timeout=3s --retries=3 \
-    CMD curl -f http://localhost:${PORT:-80}/status 2>/dev/null || exit 1 \
-    || exit 1
-
 # Run Laravel HTTP server
 # PORT from DockHosting environment variable, fallback to 80
 CMD php artisan serve --host=0.0.0.0 --port=${PORT:-80}
