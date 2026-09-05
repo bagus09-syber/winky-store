@@ -17,7 +17,12 @@ class RecommendationService
     {
         $key = $this->getSessionKey();
 
-        $viewed = Cache::get("recently_viewed:{$key}", []);
+        try {
+            $viewed = Cache::get("recently_viewed:{$key}", []);
+        } catch (\Exception $e) {
+            \Log::warning("RecommendationService: Cache error in getRecentlyViewed", ['error' => $e->getMessage()]);
+            $viewed = [];
+        }
 
         if (empty($viewed)) return [];
 
@@ -52,19 +57,35 @@ class RecommendationService
         $key = $this->getSessionKey();
         $cacheKey = "recently_viewed:{$key}";
 
-        $viewed = Cache::get($cacheKey, []);
+        try {
+            $viewed = Cache::get($cacheKey, []);
+        } catch (\Exception $e) {
+            \Log::warning("RecommendationService: Cache error in trackProductView get", ['error' => $e->getMessage()]);
+            $viewed = [];
+        }
 
         $viewed = array_filter($viewed, fn($id) => $id !== $productId);
         array_unshift($viewed, $productId);
         $viewed = array_slice($viewed, 0, 50);
 
-        Cache::put($cacheKey, array_values($viewed), 86400);
+        try {
+            Cache::put($cacheKey, array_values($viewed), 86400);
+        } catch (\Exception $e) {
+            \Log::warning("RecommendationService: Cache put error in trackProductView put", ['error' => $e->getMessage()]);
+        }
     }
 
     public function getSimilarProducts(Product $product, int $limit = 6): array
     {
+        if (!$product->id) return [];
+
         $cacheKey = "similar:{$product->id}";
-        $cached = Cache::get($cacheKey);
+        try {
+            $cached = Cache::get($cacheKey);
+        } catch (\Exception $e) {
+            \Log::warning("RecommendationService: Cache error in getSimilarProducts", ['error' => $e->getMessage()]);
+            $cached = null;
+        }
         if ($cached) return $cached;
 
         $products = Product::where('is_active', true)
@@ -101,14 +122,25 @@ class RecommendationService
             ])
             ->toArray();
 
-        Cache::put($cacheKey, $products, 600);
+        try {
+            Cache::put($cacheKey, $products, 600);
+        } catch (\Exception $e) {
+            \Log::warning("RecommendationService: Cache put error in getSimilarProducts", ['error' => $e->getMessage()]);
+        }
         return $products;
     }
 
     public function getFrequentlyBoughtTogether(Product $product, int $limit = 4): array
     {
+        if (!$product->id) return [];
+
         $cacheKey = "fbt:{$product->id}";
-        $cached = Cache::get($cacheKey);
+        try {
+            $cached = Cache::get($cacheKey);
+        } catch (\Exception $e) {
+            \Log::warning("RecommendationService: Cache error in getFrequentlyBoughtTogether", ['error' => $e->getMessage()]);
+            $cached = null;
+        }
         if ($cached) return $cached;
 
         $orderIds = OrderItem::where('product_id', $product->id)
@@ -118,114 +150,169 @@ class RecommendationService
 
         if ($orderIds->isEmpty()) return [];
 
-        $products = OrderItem::whereIn('order_id', $orderIds)
-            ->where('product_id', '!=', $product->id)
-            ->select('product_id', DB::raw('COUNT(*) as frequency'))
-            ->groupBy('product_id')
-            ->orderByDesc('frequency')
-            ->take($limit)
-            ->pluck('product_id')
-            ->toArray();
+        try {
+            $products = OrderItem::whereIn('order_id', $orderIds)
+                ->where('product_id', '!=', $product->id)
+                ->select('product_id', DB::raw('COUNT(*) as frequency'))
+                ->groupBy('product_id')
+                ->orderByDesc('frequency')
+                ->take($limit)
+                ->pluck('product_id')
+                ->toArray();
+        } catch (\Exception $e) {
+            \Log::warning("RecommendationService: DB error in getFrequentlyBoughtTogether", ['error' => $e->getMessage()]);
+            return [];
+        }
 
         if (empty($products)) return [];
 
-        $result = Product::whereIn('id', $products)
-            ->where('is_active', true)
-            ->where('stock', '>', 0)
-            ->with(['category', 'brand'])
-            ->get()
-            ->map(fn($p) => [
-                'id' => $p->id,
-                'name' => $p->name,
-                'slug' => $p->slug,
-                'price' => $p->price,
-                'sale_price' => $p->sale_price,
-                'effective_price' => $p->getEffectivePrice(),
-                'image' => $p->image,
-            ])
-            ->toArray();
+        try {
+            $result = Product::whereIn('id', $products)
+                ->where('is_active', true)
+                ->where('stock', '>', 0)
+                ->with(['category', 'brand'])
+                ->get()
+                ->map(fn($p) => [
+                    'id' => $p->id,
+                    'name' => $p->name,
+                    'slug' => $p->slug,
+                    'price' => $p->price,
+                    'sale_price' => $p->sale_price,
+                    'effective_price' => $p->getEffectivePrice(),
+                    'image' => $p->image,
+                ])
+                ->toArray();
+        } catch (\Exception $e) {
+            \Log::warning("RecommendationService: DB error in getFrequentlyBoughtTogether result", ['error' => $e->getMessage()]);
+            return [];
+        }
 
-        Cache::put($cacheKey, $result, 600);
+        try {
+            Cache::put($cacheKey, $result, 600);
+        } catch (\Exception $e) {
+            \Log::warning("RecommendationService: Cache put error in getFrequentlyBoughtTogether", ['error' => $e->getMessage()]);
+        }
         return $result;
     }
 
-    public function getTrendingProducts(int $limit = 10): array
+public function getTrendingProducts(int $limit = 10): array
     {
         $cacheKey = 'ai:trending_products';
-        $cached = Cache::get($cacheKey);
+        try {
+            $cached = Cache::get($cacheKey);
+        } catch (\Exception $e) {
+            \Log::warning("RecommendationService: Cache error in getTrendingProducts", ['error' => $e->getMessage()]);
+            $cached = null;
+        }
         if ($cached) return $cached;
 
-        $products = Product::where('is_active', true)
-            ->where('stock', '>', 0)
-            ->with(['category', 'brand'])
-            ->select('products.*', DB::raw('
-                (SELECT COUNT(*) FROM order_items WHERE order_items.product_id = products.id) as order_count,
-                (SELECT COUNT(*) FROM wishlists WHERE wishlists.product_id = products.id) as wishlist_count
-            '))
-            ->orderByRaw('order_count + wishlist_count DESC')
-            ->take($limit)
-            ->get()
-            ->map(fn($p) => [
-                'id' => $p->id,
-                'name' => $p->name,
-                'slug' => $p->slug,
-                'price' => $p->price,
-                'sale_price' => $p->sale_price,
-                'effective_price' => $p->getEffectivePrice(),
-                'image' => $p->image,
-                'brand' => $p->brand->name ?? '-',
-                'average_rating' => $p->average_rating,
-                'order_count' => $p->order_count,
-            ])
-            ->toArray();
+        try {
+            $products = Product::where('is_active', true)
+                ->where('stock', '>', 0)
+                ->with(['category', 'brand'])
+                ->select('products.*', DB::raw('
+                    (SELECT COUNT(*) FROM order_items WHERE order_items.product_id = products.id) as order_count,
+                    (SELECT COUNT(*) FROM wishlists WHERE wishlists.product_id = products.id) as wishlist_count
+                '))
+                ->orderByRaw('order_count + wishlist_count DESC')
+                ->take($limit)
+                ->get()
+                ->map(fn($p) => [
+                    'id' => $p->id,
+                    'name' => $p->name,
+                    'slug' => $p->slug,
+                    'price' => $p->price,
+                    'sale_price' => $p->sale_price,
+                    'effective_price' => $p->getEffectivePrice(),
+                    'image' => $p->image,
+                    'brand' => $p->brand->name ?? '-',
+                    'order_count' => $p->order_count,
+                ])
+                ->toArray();
+        } catch (\Exception $e) {
+            \Log::warning("RecommendationService: DB error in getTrendingProducts", ['error' => $e->getMessage()]);
+            return [];
+        }
 
-        Cache::put($cacheKey, $products, 300);
+        try {
+            Cache::put($cacheKey, $products, 300);
+        } catch (\Exception $e) {
+            \Log::warning("RecommendationService: Cache put error in getTrendingProducts", ['error' => $e->getMessage()]);
+        }
         return $products;
     }
 
-    public function getPopularProducts(int $limit = 10): array
+public function getPopularProducts(int $limit = 10): array
     {
         $cacheKey = 'ai:popular_products';
-        $cached = Cache::get($cacheKey);
+        try {
+            $cached = Cache::get($cacheKey);
+        } catch (\Exception $e) {
+            \Log::warning("RecommendationService: Cache error in getPopularProducts", ['error' => $e->getMessage()]);
+            $cached = null;
+        }
         if ($cached) return $cached;
 
-        $products = Product::where('is_active', true)
-            ->where('stock', '>', 0)
-            ->with(['category', 'brand'])
-            ->orderByRaw('(SELECT COUNT(*) FROM reviews WHERE reviews.product_id = products.id AND is_approved = 1) DESC')
-            ->take($limit)
-            ->get()
-            ->map(fn($p) => [
-                'id' => $p->id,
-                'name' => $p->name,
-                'slug' => $p->slug,
-                'price' => $p->price,
-                'sale_price' => $p->sale_price,
-                'effective_price' => $p->getEffectivePrice(),
-                'image' => $p->image,
-                'brand' => $p->brand->name ?? '-',
-                'average_rating' => $p->average_rating,
-                'reviews_count' => $p->reviews_count,
-            ])
-            ->toArray();
+        try {
+            $products = Product::where('is_active', true)
+                ->where('stock', '>', 0)
+                ->with(['category', 'brand'])
+                ->orderByRaw('(SELECT COUNT(*) FROM reviews WHERE reviews.product_id = products.id AND is_approved = 1) DESC')
+                ->take($limit)
+                ->get()
+                ->map(fn($p) => [
+                    'id' => $p->id,
+                    'name' => $p->name,
+                    'slug' => $p->slug,
+                    'price' => $p->price,
+                    'sale_price' => $p->sale_price,
+                    'effective_price' => $p->getEffectivePrice(),
+                    'image' => $p->image,
+                    'brand' => $p->brand->name ?? '-',
+                    'average_rating' => $p->average_rating,
+                ])
+                ->toArray();
+        } catch (\Exception $e) {
+            \Log::warning("RecommendationService: DB error in getPopularProducts", ['error' => $e->getMessage()]);
+            return [];
+        }
 
-        Cache::put($cacheKey, $products, 600);
+        try {
+            Cache::put($cacheKey, $products, 600);
+        } catch (\Exception $e) {
+            \Log::warning("RecommendationService: Cache put error in getPopularProducts", ['error' => $e->getMessage()]);
+        }
         return $products;
     }
 
     public function getRecommendedForUser(int $userId, int $limit = 10): array
     {
         $cacheKey = "recommended:{$userId}";
-        $cached = Cache::get($cacheKey);
+        try {
+            $cached = Cache::get($cacheKey);
+        } catch (\Exception $e) {
+            \Log::warning("RecommendationService: Cache error in getRecommendedForUser", ['error' => $e->getMessage()]);
+            $cached = null;
+        }
         if ($cached) return $cached;
 
-        $purchasedCategoryIds = OrderItem::whereHas('order', fn($q) => $q->where('user_id', $userId))
-            ->pluck('product_id')
-            ->unique();
+        try {
+            $purchasedCategoryIds = OrderItem::whereHas('order', fn($q) => $q->where('user_id', $userId))
+                ->pluck('product_id')
+                ->unique();
+        } catch (\Exception $e) {
+            \Log::warning("RecommendationService: DB error in getRecommendedForUser purchased", ['error' => $e->getMessage()]);
+            $purchasedCategoryIds = collect();
+        }
 
-        $wishlistCategoryIds = Wishlist::where('user_id', $userId)
-            ->pluck('product_id')
-            ->unique();
+        try {
+            $wishlistCategoryIds = Wishlist::where('user_id', $userId)
+                ->pluck('product_id')
+                ->unique();
+        } catch (\Exception $e) {
+            \Log::warning("RecommendationService: DB error in getRecommendedForUser wishlist", ['error' => $e->getMessage()]);
+            $wishlistCategoryIds = collect();
+        }
 
         $allInteracted = $purchasedCategoryIds->merge($wishlistCategoryIds)->unique();
 
@@ -233,37 +320,51 @@ class RecommendationService
             return $this->getTrendingProducts($limit);
         }
 
-        $categoryScores = DB::table('products')
-            ->whereIn('id', $allInteracted)
-            ->select('category_id', DB::raw('COUNT(*) as count'))
-            ->groupBy('category_id')
-            ->pluck('count', 'category_id')
-            ->toArray();
+        try {
+            $categoryScores = DB::table('products')
+                ->whereIn('id', $allInteracted)
+                ->select('category_id', DB::raw('COUNT(*) as count'))
+                ->groupBy('category_id')
+                ->pluck('count', 'category_id')
+                ->toArray();
+        } catch (\Exception $e) {
+            \Log::warning("RecommendationService: DB error in getRecommendedForUser category scores", ['error' => $e->getMessage()]);
+            return $this->getTrendingProducts($limit);
+        }
 
         arsort($categoryScores);
         $topCategories = array_slice(array_keys($categoryScores), 0, 3);
 
-        $products = Product::where('is_active', true)
-            ->where('stock', '>', 0)
-            ->whereNotIn('id', $allInteracted->toArray())
-            ->whereIn('category_id', $topCategories)
-            ->with(['category', 'brand'])
-            ->take($limit)
-            ->get()
-            ->map(fn($p) => [
-                'id' => $p->id,
-                'name' => $p->name,
-                'slug' => $p->slug,
-                'price' => $p->price,
-                'sale_price' => $p->sale_price,
-                'effective_price' => $p->getEffectivePrice(),
-                'image' => $p->image,
-                'brand' => $p->brand->name ?? '-',
-                'average_rating' => $p->average_rating,
-            ])
-            ->toArray();
+        try {
+            $products = Product::where('is_active', true)
+                ->where('stock', '>', 0)
+                ->whereNotIn('id', $allInteracted->toArray())
+                ->whereIn('category_id', $topCategories)
+                ->with(['category', 'brand'])
+                ->take($limit)
+                ->get()
+                ->map(fn($p) => [
+                    'id' => $p->id,
+                    'name' => $p->name,
+                    'slug' => $p->slug,
+                    'price' => $p->price,
+                    'sale_price' => $p->sale_price,
+                    'effective_price' => $p->getEffectivePrice(),
+                    'image' => $p->image,
+                    'brand' => $p->brand->name ?? '-',
+                    'average_rating' => $p->average_rating,
+                ])
+                ->toArray();
+        } catch (\Exception $e) {
+            \Log::warning("RecommendationService: DB error in getRecommendedForUser products", ['error' => $e->getMessage()]);
+            return $this->getTrendingProducts($limit);
+        }
 
-        Cache::put($cacheKey, $products, 900);
+        try {
+            Cache::put($cacheKey, $products, 900);
+        } catch (\Exception $e) {
+            \Log::warning("RecommendationService: Cache put error in getRecommendedForUser", ['error' => $e->getMessage()]);
+        }
         return $products;
     }
 
