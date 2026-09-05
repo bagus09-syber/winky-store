@@ -18,7 +18,7 @@
             </button>
 
 <!-- Desktop Navigation -->
-            <div class="hidden lg:flex lg:items-center lg:gap-8 lg:flex-wrap">
+            <div class="hidden lg:flex lg:items-center lg:gap-4">
                 <a href="{{ route('home') }}" class="nx-link text-white/80 hover:text-[var(--cyan)] font-medium text-[13px] tracking-wide px-4 py-2 relative">Home</a>
                 <a href="{{ route('products.index') }}" class="nx-link text-white/80 hover:text-[var(--cyan)] font-medium text-[13px] tracking-wide px-4 py-2">Semua Produk</a>
                 @php
@@ -38,7 +38,7 @@
                 @endphp
                 @foreach($navCategories as $navCat)
                 <div class="relative group" style="position:relative;">
-                    <a href="{{ route('products.index', ['category' => $navCat->slug]) }}" class="nx-link text-white/80 hover:text-[var(--cyan)] font-medium text-[13px] tracking-wide px-4 py-2 flex items-center gap-1">
+                    <a href="{{ route('products.index', ['category' => $navCat->slug]) }}" class="nx-link text-white/80 hover:text-[var(--cyan)] font-medium text-[11px] tracking-wide px-3 py-1.5 flex items-center gap-0.5">
                         {{ $navCat->name }}
                         @if($navCat->children->count() > 0)
                         <svg style="width:10px;height:10px;opacity:0.5;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
@@ -59,8 +59,8 @@
                 @endforeach
             </div>
 
-            <!-- Right Side Tablet/Mobile Actions (only show on lg+) -->
-            <div class="lg:hidden">
+            <!-- Right Side Actions -->
+            <div class="flex items-center gap-2 lg:gap-2">
                 <!-- Search -->
                 <button id="search-btn" class="relative p-2.5 text-white/60 hover:text-[var(--cyan)] transition-colors rounded-xl hover:bg-white/5" aria-label="Search">
                     <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
