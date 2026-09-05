@@ -2,16 +2,22 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between h-16 lg:h-[72px]">
             <!-- Logo -->
-            <a href="{{ route('home') }}" class="flex items-center gap-3 font-display font-bold text-xl lg:text-2xl group" aria-label="Winky Store Home">
-                <div class="w-10 h-10 lg:w-11 lg:h-11 rounded-xl glow-cyan flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                    <svg class="w-6 h-6 lg:w-6 lg:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <a href="{{ route('home') }}" class="flex items-center gap-2.5 font-display font-bold text-lg lg:text-xl group" aria-label="Winky Store Home">
+                <div class="w-8 h-8 rounded-xl glow-cyan flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
                     </svg>
                 </div>
-                <span class="gradient-text hidden sm:block">WINKY STORE</span>
+                <span class="gradient-text hidden sm:block self-center">WINKY STORE</span>
             </a>
 
-            <!-- Desktop Navigation -->
+            <!-- Mobile Menu Button -->
+            <button id="mobile-menu-btn" class="lg:hidden p-2 rounded-xl text-white/60 hover:text-[var(--cyan)] transition-colors" aria-label="Menu" onclick="toggleMobileMenu()">
+                <svg id="menu-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                <svg id="close-icon" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+
+            <!-- Mobile Navigation (hidden on lg+, shown on sm) -->
             <div class="hidden lg:flex lg:items-center lg:gap-1">
                 <a href="{{ route('home') }}" class="nx-link text-white/80 hover:text-[var(--cyan)] font-medium text-[13px] tracking-wide px-4 py-2 relative">Home</a>
                 <a href="{{ route('products.index') }}" class="nx-link text-white/80 hover:text-[var(--cyan)] font-medium text-[13px] tracking-wide px-4 py-2">Semua Produk</a>
@@ -357,7 +363,7 @@
         </div>
     </div>
 
-    <script>
+<script>
         function toggleSubmenu(btn) {
             const submenu = btn.nextElementSibling;
             const icon = btn.querySelector('svg');
@@ -396,12 +402,24 @@
             if (arrow) arrow.classList.remove('rotate-180');
         }
 
-        document.addEventListener('click', function(e) {
-            var nd = document.getElementById('notif-dropdown-wrapper');
-            var ud = document.getElementById('user-dropdown-wrapper');
-            if (nd && !nd.contains(e.target) && ud && !ud.contains(e.target)) closeAllDropdowns();
-            else if (nd && !nd.contains(e.target)) closeAllDropdowns();
-            else if (ud && !ud.contains(e.target)) closeAllDropdowns();
-        });
-    </script>
+        function toggleMobileMenu() {
+            var menu = document.getElementById('mobile-menu');
+            var menuBtn = document.getElementById('mobile-menu-btn');
+            var menuIcon = document.getElementById('menu-icon');
+            var closeIcon = document.getElementById('close-icon');
+            var isOpen = !menu.classList.contains('open');
+            closeAllDropdowns();
+            if (isOpen) {
+                menu.classList.add('open');
+                menu.classList.remove('hidden');
+                menuIcon.classList.add('hidden');
+                closeIcon.classList.remove('hidden');
+            } else {
+                menu.classList.add('hidden');
+                menu.classList.remove('open');
+                menuIcon.classList.remove('hidden');
+                closeIcon.classList.add('hidden');
+            }
+        }
+</script>
 </nav>

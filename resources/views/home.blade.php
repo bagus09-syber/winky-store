@@ -2,40 +2,48 @@
 @section('content')
 
 {{-- ═══════════════════════ HERO ═══════════════════════ --}}
-<section style="min-height:100vh;display:flex;align-items:center;position:relative;overflow:hidden;padding-top:80px;">
+<section style="min-height:100vh;display:flex;align-items:center;position:relative;overflow:hidden;padding-top:80px;padding-bottom:60px;">
     <div style="position:absolute;inset:0;pointer-events:none;overflow:hidden;">
         <div style="position:absolute;top:10%;left:5%;width:600px;height:600px;background:radial-gradient(circle,rgba(0,229,255,0.07),transparent 70%);border-radius:50%;filter:blur(60px);"></div>
         <div style="position:absolute;bottom:10%;right:8%;width:500px;height:500px;background:radial-gradient(circle,rgba(41,121,255,0.06),transparent 70%);border-radius:50%;filter:blur(60px);"></div>
         <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:900px;height:900px;background:radial-gradient(circle,rgba(0,229,255,0.03),transparent 60%);border-radius:50%;"></div>
     </div>
     <div class="container" style="position:relative;z-index:2;width:100%;">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center;" class="hero-grid">
+        <div style="display:flex;grid-template-columns:1fr;gap:48px;align-items:center;" class="hero-grid">
             <div style="max-width:600px;">
                 <div style="display:inline-flex;align-items:center;gap:8px;padding:8px 18px;background:rgba(0,229,255,0.06);border:1px solid rgba(0,229,255,0.12);border-radius:100px;margin-bottom:32px;">
                     <span style="position:relative;width:8px;height:8px;"><span style="position:absolute;inset:0;border-radius:50%;background:var(--cyan);animation:ping 2s ease-in-out infinite;"></span><span style="position:relative;width:8px;height:8px;border-radius:50%;background:var(--cyan);display:block;"></span></span>
                     <span style="color:var(--cyan);font-size:13px;font-weight:600;letter-spacing:.5px;">Flash Sale — Up to 70% OFF</span>
                 </div>
-                <h1 style="font-family:'Space Grotesk',sans-serif;font-size:clamp(42px,6vw,72px);font-weight:800;line-height:1.04;margin:0 0 28px;letter-spacing:-1.5px;">
+                <h1 style="font-family:'Space Grotesk',sans-serif;font-size:clamp(36px,5.5vw,48px);font-weight:800;line-height:1.1;margin:0 0 24px;letter-spacing:-1.5px;">
                     <span class="gx-text">Smart Tech,</span><br>
                     <span style="color:var(--text);">Better Life.</span>
                 </h1>
-                <p style="color:var(--text-secondary);font-size:18px;line-height:1.7;margin:0 0 40px;max-width:480px;">
+                <p style="color:var(--text-secondary);font-size:16px;line-height:1.6;margin:0 0 32px;max-width:480px;">
                     Discover the latest smartphones, laptops, and gadgets with premium quality at competitive prices.
                 </p>
-                <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:56px;">
+                <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:40px;">
                     <a href="#products" class="btn-glow">Shop Now <svg style="width:18px;height:18px" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg></a>
                     <a href="#categories" class="btn-ghost">Explore Categories</a>
                 </div>
-                <div style="display:flex;gap:40px;">
-                    <div><div style="font-family:'Space Grotesk',sans-serif;font-size:32px;font-weight:800;color:var(--text);">50K+</div><div style="color:var(--text-secondary);font-size:13px;margin-top:4px;">Products</div></div>
-                    <div style="width:1px;background:var(--border-light);"></div>
-                    <div><div style="font-family:'Space Grotesk',sans-serif;font-size:32px;font-weight:800;color:var(--text);">100K+</div><div style="color:var(--text-secondary);font-size:13px;margin-top:4px;">Customers</div></div>
-                    <div style="width:1px;background:var(--border-light);"></div>
-                    <div><div style="font-family:'Space Grotesk',sans-serif;font-size:32px;font-weight:800;color:var(--text);">4.9</div><div style="color:var(--text-secondary);font-size:13px;margin-top:4px;">Rating</div></div>
+<div style="display:flex;gap:24px;">
+                    <div><div style="font-family:'Space Grotesk',sans-serif;font-size:28px;font-weight:800;color:var(--text);">50K+</div><div style="color:var(--text-secondary);font-size:11px;margin-top:2px;">Products</div></div>
+                    <div style="width:1px;background:var(--border-light);margin:0 8px;"></div>
+                    <div><div style="font-family:'Space Grotesk',sans-serif;font-size:28px;font-weight:800;color:var(--text);">100K+</div><div style="color:var(--text-secondary);font-size:11px;margin-top:2px;">Customers</div></div>
+                    <div style="width:1px;background:var(--border-light);margin:0 8px;"></div>
+                    <div><div style="font-family:'Space Grotesk',sans-serif;font-size:28px;font-weight:800;color:var(--text);">4.9</div><div style="color:var(--text-secondary);font-size:11px;margin-top:2px;">Rating</div></div>
                 </div>
+                <style>
+                    @media (max-width: 390px) {
+                        .hero-grid > div:first-child { gap: 32px; }
+                        .hero-grid > div:first-child .cdigit-label { display: none; }
+                        .hero-grid > div:first-child div[style*="margin:0 8px"] { display: none; }
+                        .hero-grid > div:last-child { max-width: 100%; margin-left: auto; margin-right: auto; }
+                    }
+                </style>
             </div>
-            <div class="hero-card-wrap" style="display:flex;justify-content:center;position:relative;padding:48px 0;">
-                    <div class="floating" style="max-width:420px;width:100%;position:relative;background:var(--bg-card);border:1px solid var(--border);border-radius:24px;padding:32px;box-shadow:0 20px 48px rgba(0,0,0,0.3);">
+            <div class="hero-card-wrap" style="display:flex;justify-center;position:relative;padding:48px 0;">
+                    <div class="floating" style="max-width:420px;width:100%;margin-left:auto;margin-right:auto;position:relative;background:var(--bg-card);border:1px solid var(--border);border-radius:20px;padding:24px;box-shadow:0 12px 32px rgba(0,0,0,0.3);">
                     <div style="position:absolute;inset:-12px;background:linear-gradient(135deg,rgba(0,229,255,0.12),rgba(41,121,255,0.08));border-radius:36px;filter:blur(20px);transform:rotate(3deg);"></div>
                     <div style="position:relative;background:var(--bg-glass);backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,0.08);border-radius:28px;padding:36px;box-shadow:0 32px 64px rgba(0,0,0,0.4);">
                         <div style="text-align:center;margin-bottom:20px;">
@@ -53,11 +61,12 @@
                     </div>
                 </div>
             </div>
+</div>
         </div>
     </div>
 </section>
 
-{{-- ═══════════════════════ ADVANTAGES BAR ═══════════════════════ --}}
+ {{-- ═══════════════════════ ADVANTAGES BAR ═══════════════════════ --}}
 <section class="sec-sm" style="border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--bg-card);">
     <div class="container">
         <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:24px;" class="adv-grid">
@@ -91,13 +100,19 @@
                 <h2 style="font-family:'Space Grotesk',sans-serif;font-size:36px;font-weight:800;margin:0;">Today's Flash Deals</h2>
             </div>
             <div style="display:flex;align-items:center;gap:8px;" class="home-countdown">
-                <span style="color:var(--text-secondary);font-size:14px;margin-right:8px;">Ends in:</span>
-                <div class="cdigit"><div id="cd-h" class="cdigit-num">00</div><div class="cdigit-label">Hrs</div></div>
-                <span class="cdot">:</span>
-                <div class="cdigit"><div id="cd-m" class="cdigit-num">00</div><div class="cdigit-label">Min</div></div>
-                <span class="cdot">:</span>
-                <div class="cdigit"><div id="cd-s" class="cdigit-num">00</div><div class="cdigit-label">Sec</div></div>
+                <span style="color:var(--text-secondary);font-size:12px;margin-right:4px;">Ends in:</span>
+                <div class="cdigit"><div id="cd-h" class="cdigit-num">00</div><div class="cdigit-label" style="font-size:10px;">Jam</div></div>
+                <span class="cdot" style="font-size:12px;">:</span>
+                <div class="cdigit"><div id="cd-m" class="cdigit-num">00</div><div class="cdigit-label" style="font-size:10px;">Menit</div></div>
+                <span class="cdot" style="font-size:12px;">:</span>
+                <div class="cdigit"><div id="cd-s" class="cdigit-num">00</div><div class="cdigit-label" style="font-size:10px;">Detik</div></div>
             </div>
+            <style>
+                @media (max-width: 390px) {
+                    .home-countdown { flex-direction: column; align-items: flex-start; gap: 4px; }
+                    .home-countdown .cdot { display: none; }
+                }
+            </style>
         </div>
         @if($flashSaleProducts->count())
         <div class="fs-scroll scrollbar-hide">
