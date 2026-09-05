@@ -1,4 +1,4 @@
-FROM php:8.2-fpm-alpine AS laravel-build
+FROM php:8.2-fpm-alpine
 
 # Install system dependencies
 RUN apk add --no-cache \
@@ -10,13 +10,12 @@ RUN apk add --no-cache \
     zip \
     unzip \
     gnupg \
-    linux-headers \
     libpng-dev \
-    libjpeg-dev \
     freetype-dev \
-    oniguriri-dev \
+    oniguruma-dev \
     libxml2-dev \
     icu-dev \
+    zlib-dev \
     argon2-dev
 
 # Install PHP extensions
@@ -28,62 +27,25 @@ COPY --from=composer:2.6 /usr/bin/composer /usr/bin/composer
 # Set working directory
 WORKDIR /var/www
 
-# Copy application code
+# Copy application code (without .env - DockHosting provides env vars at runtime)
 COPY . /var/www
 
-# Install dependencies (production)
+# Install dependencies (production only)
 RUN composer install --no-interaction --optimize-autoloader --no-dev \
     && rm -rf /root/.composer/cache
 
-# Generate application key if not present
-RUN if [ ! -f .env ]; then cp .env.example .env; fi \
-    && php artisan key:generate --force \
-    && php artisan config:cache \
-    && php artisan route:cache \
-    && php artisan view:cache
-
-# ---------------------------------------------------------
-# Production stage - non-root user
-# ---------------------------------------------------------
-FROM php:8.2-fpm-alpine AS laravel-production
-
-# Install system dependencies (leaner)
-RUN apk add --no-cache \
-    openssl \
-    ca-certificates \
-    zip \
-    unzip \
-    git \
-    bash
-
-# Install PHP extensions
-RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
-
 # Create non-root user
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup \
+    && chown -R appuser:appgroup /var/www/storage /var/www/bootstrap/cache
 
-# Copy compiled application from build stage
-COPY --from=laravel-build /var/www /var/www
+# Expose port for DockHosting (environment variable PORT will override default 80)
+EXPOSE 80
 
-# Set working directory
-WORKDIR /var/www
-
-# Copy .env (production values expected)
-COPY .env /var/www/.env
-
-# Fix ownership for non-root user
-RUN chown -R appuser:appgroup /var/www/storage /var/www/bootstrap/cache
-
-# PHP-FPM production tuning
-COPY www.conf /usr/local/etc/php-fpm.d/www.conf
-
-# Expose port 9000 and start FPM
-EXPOSE 9000
-
-# Health check
+# Health check HTTP endpoint
 HEALTHCHECK --interval=30s --timeout=3s --retries=3 \
-    CMD curl -f http://localhost:9000/status 2>/dev/null || exit 1
+    CMD curl -f http://localhost:${PORT:-80}/status 2>/dev/null || exit 1 \
+    || exit 1
 
-USER appuser
-
-CMD ["php-fpm"]
+# Run Laravel HTTP server
+# PORT from DockHosting environment variable, fallback to 80
+CMD php artisan serve --host=0.0.0.0 --port=${PORT:-80}
