@@ -43,7 +43,7 @@
                 </style>
             </div>
             <div class="hero-card-wrap" style="display:flex;justify-center;position:relative;padding:48px 0;">
-                    <div class="floating" style="max-width:420px;width:100%;margin-left:auto;margin-right:auto;position:relative;background:var(--bg-card);border:1px solid var(--border);border-radius:20px;padding:24px;box-shadow:0 12px 32px rgba(0,0,0,0.3);">
+                    <div class="floating" style="max-width:420px;width:100%;margin-left:auto;margin:right:auto;position:relative;background:var(--bg-card);border:1px solid var(--border);border-radius:20px;padding:24px;box-shadow:0 12px 32px rgba(0,0,0,0.3);">
                     <div style="position:absolute;inset:-12px;background:linear-gradient(135deg,rgba(0,229,255,0.12),rgba(41,121,255,0.08));border-radius:36px;filter:blur(20px);transform:rotate(3deg);"></div>
                     <div style="position:relative;background:var(--bg-glass);backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,0.08);border-radius:28px;padding:36px;box-shadow:0 32px 64px rgba(0,0,0,0.4);">
                         <div style="text-align:center;margin-bottom:20px;">
@@ -61,9 +61,22 @@
                     </div>
                 </div>
             </div>
-</div>
         </div>
-    </div>
+        <style>
+            @media (min-width: 1024px) and (max-height: 800px) {
+                .hero-grid > div:first-child { padding-top: 40px; padding-bottom: 40px; }
+                .hero-card-wrap { padding: 32px 0; }
+                .hero-card-wrap .floating { padding: 20px; }
+                .hero-card-wrap .floating .pcard-img img { max-width: 210px; max-height: 210px; }
+                .hero-card-wrap .pcard-info { padding: 12px 16px; }
+                .hero-card-wrap .pcard-info .pcard-brand { font-size: 10px; }
+                .hero-card-wrap .pcard-info .pcard-name { font-size: 12px; }
+                .hero-card-wrap .pcard-info .pcard-price { font-size: 18px; }
+                .hero-card-wrap .add-cart-btn { margin-top: 12px; font-size: 12px; padding: 8px 16px; }
+                .hero-grid { gap: 32px; }
+                .hero-grid > div:first-child { max-width: 100%; }
+            }
+        </style>
 </section>
 
  <style>
