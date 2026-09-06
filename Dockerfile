@@ -38,9 +38,12 @@ RUN composer install --no-interaction --optimize-autoloader --no-dev \
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup \
     && chown -R appuser:appgroup /var/www/storage /var/www/bootstrap/cache
 
+# Copy entrypoint script
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
 # Expose port for DockHosting (environment variable PORT will override default 80)
 EXPOSE 80
 
-# Run Laravel HTTP server
-# PORT from DockHosting environment variable, fallback to 80
-CMD php artisan serve --host=0.0.0.0 --port=${PORT:-80}
+# Run Laravel HTTP server using entrypoint
+ENTRYPOINT ["docker-entrypoint.sh"]
