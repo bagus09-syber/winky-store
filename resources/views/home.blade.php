@@ -2,14 +2,14 @@
 @section('content')
 
 {{-- ═══════════════════════ HERO ═══════════════════════ --}}
-<section style="min-height:100vh;display:flex;align-items:center;position:relative;overflow:hidden;padding-top:80px;padding-bottom:60px;">
+<section style="height:auto;display:flex;align-items:center;position:relative;overflow:visible;padding-top:80px;padding-bottom:60px;">
     <div style="position:absolute;inset:0;pointer-events:none;overflow:hidden;">
         <div style="position:absolute;top:10%;left:5%;width:600px;height:600px;background:radial-gradient(circle,rgba(0,229,255,0.07),transparent 70%);border-radius:50%;filter:blur(60px);"></div>
         <div style="position:absolute;bottom:10%;right:8%;width:500px;height:500px;background:radial-gradient(circle,rgba(41,121,255,0.06),transparent 70%);border-radius:50%;filter:blur(60px);"></div>
         <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:900px;height:900px;background:radial-gradient(circle,rgba(0,229,255,0.03),transparent 60%);border-radius:50%;"></div>
     </div>
     <div class="container" style="position:relative;z-index:2;width:100%;">
-        <div style="display:flex;grid-template-columns:1fr;gap:48px;align-items:center;" class="hero-grid">
+        <div style="display:grid;grid-template-columns:minmax(0, 1.1fr) minmax(320px, .9fr);gap:48px;align-items:center;overflow:visible;" class="hero-grid">
             <div style="max-width:600px;">
                 <div style="display:inline-flex;align-items:center;gap:8px;padding:8px 18px;background:rgba(0,229,255,0.06);border:1px solid rgba(0,229,255,0.12);border-radius:100px;margin-bottom:32px;">
                     <span style="position:relative;width:8px;height:8px;"><span style="position:absolute;inset:0;border-radius:50%;background:var(--cyan);animation:ping 2s ease-in-out infinite;"></span><span style="position:relative;width:8px;height:8px;border-radius:50%;background:var(--cyan);display:block;"></span></span>
@@ -50,8 +50,8 @@
                             <div style="font-size:11px;font-weight:700;color:var(--cyan);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;">Featured Product</div>
                             <a href="{{ route('products.show', 'iphone-16-pro-max') }}" style="text-decoration:none;color:inherit;"><div style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:var(--text);">iPhone 16 Pro Max</div></a>
                         </div>
-                        <div style="background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:20px;padding:24px;display:flex;align-items:center;justify-content:center;min-height:260px;margin-bottom:24px;">
-                            <img src="{{ asset('images/products/iphone-16-pro-max.jpg') }}" alt="iPhone 16 Pro Max" style="max-height:220px;object-fit:contain;" loading="lazy" onerror="this.src='https://placehold.co/400x300/0e1425/00e5ff.png?text=iPhone+16+Pro+Max&font=roboto'">
+                        <div style="background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:20px;padding:24px;display:flex;align-items:center;justify-content:center;height:auto;margin-bottom:24px;">
+                            <img src="{{ asset('images/products/iphone-16-pro-max.jpg') }}" alt="iPhone 16 Pro Max" style="height:auto;object-fit:contain;width:min(100%, 250px);" loading="lazy" onerror="this.src='https://placehold.co/400x300/0e1425/00e5ff.png?text=iPhone+16+Pro+Max&font=roboto'">
                         </div>
                         <div style="display:flex;justify-content:space-between;align-items:flex-end;">
                             <div><div style="font-size:14px;color:var(--text-secondary);text-decoration:line-through;">Rp 19.999.000</div><div style="font-family:'Space Grotesk',sans-serif;font-size:28px;font-weight:800;color:var(--cyan);">Rp 15.999.000</div></div>
@@ -158,7 +158,7 @@
 {{-- ═══════════════════════ PROMO BANNER ═══════════════════════ --}}
 <section class="sec" style="background:var(--bg-card);border-top:1px solid var(--border);border-bottom:1px solid var(--border);">
     <div class="container">
-        <div class="promo-wrap fade-up" style="padding:80px 72px;position:relative;overflow:hidden;">
+        <div class="promo-wrap fade-up" style="padding:80px 72px;position:relative;overflow:visible;">
             <div class="promo-glow-1"></div>
             <div class="promo-glow-2"></div>
             <div style="position:relative;z-index:2;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;" class="promo-grid">
@@ -400,7 +400,7 @@
 {{-- ═══════════════════════ NEWSLETTER ═══════════════════════ --}}
 <section class="sec" style="background:var(--bg-card);border-top:1px solid var(--border);border-bottom:1px solid var(--border);">
     <div class="container">
-        <div class="fade-up" style="background:var(--bg-deep);border:1px solid var(--border);border-radius:32px;padding:80px 72px;text-align:center;position:relative;overflow:hidden;">
+        <div class="fade-up" style="background:var(--bg-deep);border:1px solid var(--border);border-radius:32px;padding:80px 72px;text-align:center;position:relative;overflow:visible;">
             <div style="position:absolute;top:-80px;right:-80px;width:300px;height:300px;background:radial-gradient(circle,rgba(0,229,255,0.06),transparent 70%);border-radius:50%;pointer-events:none;"></div>
             <div style="position:absolute;bottom:-60px;left:-60px;width:240px;height:240px;background:radial-gradient(circle,rgba(224,64,251,0.04),transparent 70%);border-radius:50%;pointer-events:none;"></div>
             <div style="position:relative;z-index:2;">
